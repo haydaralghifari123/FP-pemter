@@ -1,94 +1,116 @@
 #include <iostream>
 #include <string>
+using namespace std;
 
 int menuCount = 0;
 string* menuNames = nullptr;
 double* menuPrices = nullptr;
 
 void addMenu() {
-    string newName;
-    double newPrice;
-
-    cout << "Masukkan nama menu: ";
-    cin.ignore(); // Menghapus buffer
-    getline(cin, newName);
-    cout << "Masukkan harga menu: ";
-    cin >> newPrice;
-
-    // Buat array baru dengan ukuran lebih besar
-    string* tempNames = new string[menuCount + 1];
-    double* tempPrices = new double[menuCount + 1];
-
-    // Salin data lama ke array baru
-    for (int i = 0; i < menuCount; i++) {
-        tempNames[i] = menuNames[i];
-        tempPrices[i] = menuPrices[i];
-    }
-
-    // Tambahkan menu baru ke array
-    tempNames[menuCount] = newName;
-    tempPrices[menuCount] = newPrice;
-
-    // Ganti pointer lama dengan yang baru
-    menuNames = tempNames;
-    menuPrices = tempPrices;
-
-    menuCount++;
-
-    cout << "Menu berhasil ditambahkan!" << endl;
+string newName;
+double newPrice;
+cout << "Masukkan nama menu: ";
+cin.ignore(); // Menghapus buffer
+getline(cin, newName);
+cout << "Masukkan harga menu: ";
+cin >> newPrice;
+// Buat array baru dengan ukuran lebih besar
+string* tempNames = new string[menuCount + 1];
+double* tempPrices = new double[menuCount + 1];
+// Salin data lama ke array baru
+for (int i = 0; i < menuCount; i++) {
+tempNames[i] = menuNames[i];
+tempPrices[i] = menuPrices[i];
+}
+// Tambahkan data baru ke array
+tempNames[menuCount] = newName;
+tempPrices[menuCount] = newPrice;
+// Ganti array lama dengan array baru
+if (menuNames != nullptr) {
+delete[] menuNames;
+delete[] menuPrices;
+}
+menuNames = tempNames;
+menuPrices = tempPrices;
+menuCount++;
 }
 
 void viewMenu() {
-    if (menuCount == 0) {
-        cout << "Menu kosong!" << endl;
-        return;
-    }
+string defaultMenuNames[] = {"Nasi Goreng", "Mie Goreng", "Sate", "Gado-Gado"};
+double defaultMenuPrices[] = {15000, 12000, 18000, 10000};
+int defaultMenuCount = sizeof(defaultMenuNames) / sizeof(defaultMenuNames[0]);
 
-    cout << "Daftar Menu:" << endl;
-    for (int i = 0; i < menuCount; i++) {
-        cout << i + 1 << ". " << menuNames[i] << " - Rp " << menuPrices[i] << endl;
+// Gabungkan default menu dengan custom menu
+string* allMenuNames = new string[defaultMenuCount + menuCount];
+double* allMenuPrices = new double[defaultMenuCount + menuCount];
+
+// Salin default menu ke array baru
+for (int i = 0; i < defaultMenuCount; i++) {
+    allMenuNames[i] = defaultMenuNames[i];
+    allMenuPrices[i] = defaultMenuPrices[i];
+}
+
+// Salin custom menu ke array baru
+for (int i = 0; i < menuCount; i++) {
+    allMenuNames[defaultMenuCount + i] = menuNames[i];
+    allMenuPrices[defaultMenuCount + i] = menuPrices[i];
+}
+
+cout << "Menu:" << endl;
+for (int i = 0; i < defaultMenuCount + menuCount; i++) {
+    cout << "  " << i + 1 << ". " << allMenuNames[i] << " - Rp " << allMenuPrices[i] << endl;
+}
+
+delete[] allMenuNames;
+delete[] allMenuPrices;
+}
+
+int main() {
+int choice;
+string role;
+bool isAdmin = true;
+
+while (isAdmin) {
+    cout << "Welcome Cafe Gerilya" << endl;
+    cout << "Are you an admin or a customer? (admin/customer): ";
+    cin >> role;
+
+    if (role == "admin") {
+        do {
+            cout << "Admin Menu" << endl;
+            cout << "1. Add Menu" << endl;
+            cout << "2. Exit" << endl;
+            cout << "Choose an option: ";
+            cin >> choice;
+            if (choice == 1) {
+                addMenu();
+            } else if (choice == 2) {
+                cout << "Back to main menu..." << endl;
+                break;
+            } else {
+                cout << "Invalid option. Please try again." << endl;
+            }
+        } while (choice != 2);
+    } else if (role == "customer") {
+        do {
+            cout << "Customer Menu" << endl;
+            cout << "1. View Menu" << endl;
+            cout << "2. Exit" << endl;
+            cout << "Choose an option: ";
+            cin >> choice;
+            if (choice == 1) {
+                viewMenu();
+            } else if (choice == 2) {
+                cout << "Goodbye!" << endl;
+                isAdmin = false;
+            } else {
+                cout << "Invalid option. Please try again." << endl;
+            }
+        } while (choice != 2);
+    } else {
+        cout << "Invalid. Please try again." << endl;
     }
 }
 
-void admin() {
-    int choice;
-    do {
-        cout << "Admin Menu:" << endl;
-        cout << "1. Tambah Menu" << endl;
-        cout << "2. Lihat Menu" << endl;
-        cout << "3. Keluar ke Menu Utama" << endl;
-        cout << "Masukkan pilihan: ";
-        cin >> choice;
-
-        switch (choice) {
-        case 1:
-            addMenu();
-            break;
-        case 2:
-            viewMenu();
-            break;
-        case 3:
-            cout << "Keluar ke menu utama." << endl;
-            return;
-        default:
-            cout << "Pilihan tidak valid!" << endl;
-        }
-    } while (true);
-}
-
-
-
-int main(){
-    int a;
-
-    cout << "login admin atau customer?";
-    cin >> a;
-
-
-    if (a == 1) {
-        admin();
-    }
-    else if (a == 2) {
-        //customer();
-    }
+return 0;
 }
